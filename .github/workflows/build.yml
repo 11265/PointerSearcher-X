@@ -23,6 +23,13 @@ jobs:
         target: aarch64-apple-ios
         override: true
 
+    - name: Install dependencies
+      run: |
+        brew install automake autoconf libtool openssl  # 根据需要安装依赖
+
+    - name: Set environment variables
+      run: echo "RUST_BACKTRACE=1" >> $GITHUB_ENV  # 设置环境变量以获取更详细的错误信息
+
     - name: Build for aarch64-apple-ios
       run: cargo build --target aarch64-apple-ios --release
 
