@@ -16,23 +16,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Xcode
-      uses: maxim-lobanov/setup-xcode@v1
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
       with:
-        xcode-version: '14.3.1'  # 使用可用的 Xcode 版本
-
-    - name: Install dependencies
-      run: brew install automake autoconf libtool  # 根据需要安装依赖
+        toolchain: stable
+        target: aarch64-apple-ios
+        override: true
 
     - name: Build for aarch64-apple-ios
-      run: xcodebuild -project PointerSearcher-X.xcodeproj -scheme PointerSearcher-X -sdk iphoneos -arch arm64 clean build
-      env:
-        DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}  # 你的开发团队ID
-        CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}  # 代码签名身份
-        PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}  # 配置描述文件
+      run: cargo build --target aarch64-apple-ios --release
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: build-artifacts
-        path: build/Release-iphoneos/  # 上传构建产物
+        path: target/aarch64-apple-ios/release/  # 上传构建产物
