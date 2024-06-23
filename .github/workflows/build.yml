@@ -1,39 +1,44 @@
-name: Build PointerSearcher-X
+name: Build for aarch64-apple-ios
 
 on:
   push:
     branches:
-      - main  # 只在推送到 main 分支时触发工作流
+      - main  # 当推送到 main 分支时触发
   pull_request:
     branches:
-      - main  # 在向 main 分支提交 PR 时触发工作流
+      - main  # 当向 main 分支提交 PR 时触发
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
-    - name: Set up CMake
-      uses: jwlawson/actions-setup-cmake@v1.10
-      with:
-        cmake-version: '3.20.5'  # 指定 CMake 版本
 
-    - name: Configure with CMake
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.2.1'  # 指定 Xcode 版本
+
+    - name: Install dependencies
       run: |
-        mkdir -p build
-        cd build
-        cmake ..
-        
-    - name: Build with CMake
-      run: |
-        cd build
-        cmake --build .
-        
+        brew install automake autoconf libtool  # 根据需要安装依赖
+        sudo gem install cocoapods             # 如果使用了 CocoaPods
+    
+    - name: Install CocoaPods dependencies
+      run: pod install
+      working-directory: ./YourProjectDirectory  # 如果使用了 CocoaPods
+
+    - name: Build for aarch64-apple-ios
+      run: xcodebuild -workspace YourProject.xcworkspace -scheme YourScheme -sdk iphoneos -arch arm64 clean build
+      env:
+        DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}  # 你的开发团队ID
+        CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}  # 代码签名身份
+        PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}  # 配置描述文件
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: build-artifacts
-        path: build/  # 上传构建产物
+        path: build/Release-iphoneos/  # 上传构建产物
