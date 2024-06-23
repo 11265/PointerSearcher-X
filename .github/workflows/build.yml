@@ -1,0 +1,39 @@
+name: Build PointerSearcher-X
+
+on:
+  push:
+    branches:
+      - main  # 只在推送到 main 分支时触发工作流
+  pull_request:
+    branches:
+      - main  # 在向 main 分支提交 PR 时触发工作流
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up CMake
+      uses: jwlawson/actions-setup-cmake@v1.10
+      with:
+        cmake-version: '3.20.5'  # 指定 CMake 版本
+
+    - name: Configure with CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake ..
+        
+    - name: Build with CMake
+      run: |
+        cd build
+        cmake --build .
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-artifacts
+        path: build/  # 上传构建产物
