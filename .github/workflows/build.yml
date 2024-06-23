@@ -15,17 +15,27 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+
     - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: '14.3.1'  # 使用可用的 Xcode 版本
 
     - name: Install dependencies
-      run: brew install automake autoconf libtool  # 根据需要安装依赖
+      run: |
+        brew install automake autoconf libtool  # 根据需要安装依赖
+        sudo gem install cocoapods  # 安装 CocoaPods，如果你有 Podfile
+
+    - name: Configure with CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake -G "Xcode" ..
 
     - name: Build for aarch64-apple-ios
-      run: xcodebuild -workspace YourProject.xcworkspace -scheme YourScheme -sdk iphoneos -arch arm64 clean build
+      run: |
+        cd build
+        xcodebuild -scheme PointerSearcher-X -sdk iphoneos -arch arm64 clean build
       env:
         DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}  # 你的开发团队ID
         CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}  # 代码签名身份
