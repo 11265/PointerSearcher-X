@@ -34,18 +34,18 @@ jobs:
         cd libptrscan
         cargo build --release --target aarch64-apple-ios --verbose
         mkdir -p ../target/aarch64-apple-ios/release/deps
+        cp target/aarch64-apple-ios/release/libptrscan.a ../target/aarch64-apple-ios/release/
         cp target/aarch64-apple-ios/release/libptrscan.a ../target/aarch64-apple-ios/release/deps/
         
     - name: Build command tool
       run: |
         cd command
-        RUSTFLAGS="-L ../target/aarch64-apple-ios/release/deps" cargo build --release --target aarch64-apple-ios --verbose
+        RUSTFLAGS="-L ../target/aarch64-apple-ios/release -L ../target/aarch64-apple-ios/release/deps" cargo build --release --target aarch64-apple-ios --verbose
         
     - name: Create Release Bundle
       run: |
         mkdir -p release
         cp target/aarch64-apple-ios/release/ptrscan release/
-        cp ent.plist release/
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
@@ -59,6 +59,5 @@ jobs:
       with:
         files: |
           release/ptrscan
-          release/ent.plist
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
