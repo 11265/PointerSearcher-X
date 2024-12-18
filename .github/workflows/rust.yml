@@ -41,7 +41,7 @@ jobs:
     - name: Build command tool
       run: |
         cd command
-        RUSTFLAGS="-L ../target/aarch64-apple-ios/release/lib -l static=ptrscan" cargo build --release --target aarch64-apple-ios --verbose
+        RUSTFLAGS="-L ../target/aarch64-apple-ios/release/lib" cargo rustc --release --target aarch64-apple-ios --verbose -- -l static=ptrscan -L ../target/aarch64-apple-ios/release/lib
         
     - name: Create Release Bundle
       run: |
