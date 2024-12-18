@@ -23,6 +23,7 @@ jobs:
       with:
         toolchain: stable
         target: aarch64-apple-ios
+        profile: minimal
         override: true
         
     - name: Install iOS target
@@ -31,12 +32,12 @@ jobs:
     - name: Build libptrscan
       run: |
         cd libptrscan
-        cargo build --release --target aarch64-apple-ios
+        cargo build --release --target aarch64-apple-ios --verbose
         
     - name: Build command tool
       run: |
         cd command
-        cargo build --release --target aarch64-apple-ios
+        cargo build --release --target aarch64-apple-ios --verbose
         
     - name: Create Release Bundle
       run: |
