@@ -34,14 +34,14 @@ jobs:
         cd libptrscan
         cargo build --release --target aarch64-apple-ios --verbose
         mkdir -p ../target/aarch64-apple-ios/release/lib
-        find target/aarch64-apple-ios/release -name "libptrscan*.a" -type f -exec ls -l {} \;
-        find target/aarch64-apple-ios/release -name "libptrscan*.a" -type f -exec cp {} ../target/aarch64-apple-ios/release/lib/ \;
+        ls -la target/aarch64-apple-ios/release/deps/
+        cp target/aarch64-apple-ios/release/deps/libptrscan-*.a ../target/aarch64-apple-ios/release/lib/libptrscan.a
         ls -la ../target/aarch64-apple-ios/release/lib/
         
     - name: Build command tool
       run: |
         cd command
-        RUSTFLAGS="-L ../target/aarch64-apple-ios/release/lib -l static=ptrscan" LIBRARY_PATH="../target/aarch64-apple-ios/release/lib" cargo build --release --target aarch64-apple-ios --verbose
+        RUSTFLAGS="-L ../target/aarch64-apple-ios/release/lib -l static=ptrscan" cargo build --release --target aarch64-apple-ios --verbose
         
     - name: Create Release Bundle
       run: |
