@@ -1,22 +1,61 @@
-name: Rust
+name: iOS Build
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  ios-build:
+    name: Build iOS
+    runs-on: macos-latest
+    
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+    
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: aarch64-apple-ios
+        override: true
+        
+    - name: Install iOS target
+      run: rustup target add aarch64-apple-ios
+        
+    - name: Build libptrscan
+      run: |
+        cd libptrscan
+        cargo build --release --target aarch64-apple-ios
+        
+    - name: Build command tool
+      run: |
+        cd command
+        cargo build --release --target aarch64-apple-ios
+        
+    - name: Create Release Bundle
+      run: |
+        mkdir -p release
+        cp target/aarch64-apple-ios/release/ptrscan release/
+        cp ent.plist release/
+        
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ios-release
+        path: release/
+        
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          release/ptrscan
+          release/ent.plist
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
