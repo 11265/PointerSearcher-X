@@ -33,11 +33,13 @@ jobs:
       run: |
         cd libptrscan
         cargo build --release --target aarch64-apple-ios --verbose
+        mkdir -p ../target/aarch64-apple-ios/release/deps
+        cp target/aarch64-apple-ios/release/libptrscan.a ../target/aarch64-apple-ios/release/deps/
         
     - name: Build command tool
       run: |
         cd command
-        cargo build --release --target aarch64-apple-ios --verbose
+        RUSTFLAGS="-L ../target/aarch64-apple-ios/release/deps" cargo build --release --target aarch64-apple-ios --verbose
         
     - name: Create Release Bundle
       run: |
