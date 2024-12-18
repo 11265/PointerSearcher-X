@@ -34,7 +34,9 @@ jobs:
         cd libptrscan
         cargo build --release --target aarch64-apple-ios --verbose
         mkdir -p ../target/aarch64-apple-ios/release/lib
-        cp target/aarch64-apple-ios/release/libptrscan.a ../target/aarch64-apple-ios/release/lib/
+        find target -name "libptrscan.a" -type f -exec cp {} ../target/aarch64-apple-ios/release/lib/ \;
+        ls -la target/aarch64-apple-ios/release/deps/
+        ls -la ../target/aarch64-apple-ios/release/lib/
         
     - name: Build command tool
       run: |
